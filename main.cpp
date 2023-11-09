@@ -47,29 +47,43 @@ const int EATTIME=5;
 std::vector<Semaphore> forks(COUNT);//improvement: need to figure out how to initialize these to 1
 Semaphore table(COUNT - 1);
 
-
+/*! \fn think
+    \brief Takes a philosopher and makes them think for a random length of time.
+*/
 void think(int myID){
   int seconds=rand() % THINKTIME + 1;
   std::printf("%d is thinking!\n", myID);
   sleep(seconds);
 }
 
+/*! \fn get_forks
+    \brief Takes a philosopher and has them try to grab their left and right forks. If the forks aren't available, they wait for them to become available.
+*/
 void get_forks(int philID){
   forks[philID].Wait();
   forks[(philID+1)%COUNT].Wait();
 }
 
+/*! \fn put_forks
+    \brief Takes a philosopher and has them put the forks down.
+*/
 void put_forks(int philID){
   forks[philID].Signal();
   forks[(philID+1)%COUNT].Signal();  
 }
 
+/*! \fn eat
+    \brief Takes a philosopher and has them eat for a random length of time.
+*/
 void eat(int myID){
   int seconds=rand() % EATTIME + 1;
   std::printf("%d is chomping!\n", myID);
   sleep(seconds);  
 }
 
+/*! \fn philosopher
+    \brief Takes a philosopher and has them loop ininitely between thinking and eating. Only count - 1 pholosophers can eat at a time
+*/
 void philosopher(int id/* other params here*/){
   while(true){
     think(id);
@@ -93,7 +107,7 @@ int main(void){
     sem.Signal();
   }
 
-  for(std::thread& t: vt){
+  for(auto& t: vt){
     t=std::thread(philosopher,id++/*,params*/);
   }
   /**< Join the philosopher threads with the main thread */
